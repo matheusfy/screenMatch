@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: screanMatch
+  jackson:
+    date-format: io.swagger.RFC3339DateFormat
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
