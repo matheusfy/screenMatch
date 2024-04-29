@@ -1,5 +1,6 @@
 package io.github.matheusfy.screanmatch;
 
+import io.github.matheusfy.screanmatch.application.Principal;
 import io.github.matheusfy.screanmatch.service.ConsumoApi;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -14,14 +15,7 @@ public class ScreanMatchApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        ConsumoApi api = new ConsumoApi();
-        String endpoint = "http://www.omdbapi.com/?apikey=35dcfa5c";
-        String title = "supernatural";
-        if (title != "")
-        {
-            endpoint = endpoint + "&t=" + title;
-        }
-
-        System.out.println(api.obterDado(endpoint));
+        Principal menu = new Principal();
+        menu.exibeMenu();
     }
 }
