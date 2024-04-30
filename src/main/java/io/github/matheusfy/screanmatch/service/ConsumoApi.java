@@ -56,7 +56,7 @@ public class ConsumoApi {
             case "series":
                 DadosSerieDTO serie = conversor.obterDados(json, DadosSerieDTO.class);
                 System.out.println("Informação serie: " + serie.toString());
-//                List<DadosTemporadaDTO> lstTemporadas= getTemporadas(apiUri, serie.totalTemporadas());
+                List<DadosTemporadaDTO> lstTemporadas= getTemporadas(apiUri, serie.totalTemporadas());
                 break;
             case "movie":
                 DadosFilmeDTO filme = conversor.obterDados(json, DadosFilmeDTO.class);
@@ -73,6 +73,7 @@ public class ConsumoApi {
         for(int temporada = 1; temporada <= temporadas; temporada++){
             String linkTemporada = uri + "&Season=%d";
             DadosTemporadaDTO temporadaDTO = conversor.obterDados(buildAndSendRequest(linkTemporada.formatted(temporada)), DadosTemporadaDTO.class);
+            System.out.println(temporadaDTO);
             lstDadosTemporadas.add(temporadaDTO);
         }
 
