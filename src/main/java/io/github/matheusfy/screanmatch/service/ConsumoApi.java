@@ -1,9 +1,11 @@
 package io.github.matheusfy.screanmatch.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.matheusfy.screanmatch.model.DadosFilmeDTO;
-import io.github.matheusfy.screanmatch.model.DadosSerieDTO;
-import io.github.matheusfy.screanmatch.model.DadosTemporadaDTO;
+import io.github.matheusfy.screanmatch.model.Episodio;
+import io.github.matheusfy.screanmatch.model.dtos.EpisodioDTO;
+import io.github.matheusfy.screanmatch.model.dtos.DadosFilmeDTO;
+import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
+import io.github.matheusfy.screanmatch.model.dtos.TemporadaDTO;
 
 import java.io.IOException;
 import java.net.URI;
@@ -11,7 +13,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ConsumoApi {
     private HttpClient client;
@@ -29,8 +33,8 @@ public class ConsumoApi {
         return request;
     }
 
-    private HttpResponse sendRequest(HttpRequest request){
-        HttpResponse response = null;
+    private HttpResponse<String> sendRequest(HttpRequest request){
+        HttpResponse<String> response = null;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
@@ -40,7 +44,7 @@ public class ConsumoApi {
     }
 
     private String buildAndSendRequest(String uri){
-        HttpResponse response = sendRequest(buildRequest(uri));
+        HttpResponse<String> response = sendRequest(buildRequest(uri));
         if (response!=null) {
             return response.body().toString();
         }
@@ -54,9 +58,14 @@ public class ConsumoApi {
 
         switch (tipo){
             case "series":
-                DadosSerieDTO serie = conversor.obterDados(json, DadosSerieDTO.class);
+                SerieDTO serie = conversor.obterDados(json, SerieDTO.class);
                 System.out.println("Informação serie: " + serie.toString());
-                List<DadosTemporadaDTO> lstTemporadas= getTemporadas(apiUri, serie.totalTemporadas());
+                if (serie.totalTemporadas() != "N/A"){
+                    List<TemporadaDTO> lstTemporadas= getTemporadas(apiUri, conversor.strToInt(serie.totalTemporadas()));
+//                    getMelhoresEpisodios(lstTemporadas);
+                    getEpisodios(lstTemporadas);
+                }
+
                 break;
             case "movie":
                 DadosFilmeDTO filme = conversor.obterDados(json, DadosFilmeDTO.class);
@@ -66,18 +75,40 @@ public class ConsumoApi {
 
     }
 
-    public List<DadosTemporadaDTO> getTemporadas(String uri, Integer temporadas){
+    public List<TemporadaDTO> getTemporadas(String uri, Integer temporadas){
 
-        List<DadosTemporadaDTO> lstDadosTemporadas = new ArrayList<>();
+        List<TemporadaDTO> lstTemporadas = new ArrayList<>();
 
         for(int temporada = 1; temporada <= temporadas; temporada++){
             String linkTemporada = uri + "&Season=%d";
-            DadosTemporadaDTO temporadaDTO = conversor.obterDados(buildAndSendRequest(linkTemporada.formatted(temporada)), DadosTemporadaDTO.class);
-            System.out.println(temporadaDTO);
-            lstDadosTemporadas.add(temporadaDTO);
+            TemporadaDTO temporadaDTO = conversor.obterDados(buildAndSendRequest(linkTemporada.formatted(temporada)), TemporadaDTO.class);
+            lstTemporadas.add(temporadaDTO);
         }
 
-        return lstDadosTemporadas;
+        return lstTemporadas;
+    }
+
+    public List<Episodio> getEpisodios(List<TemporadaDTO> lstTemporadas){
+
+        return lstTemporadas.stream()
+                .flatMap( t -> t.lstEpisodios().stream()
+                        .map(e -> new Episodio(t.numero(), e)))
+                .collect(Collectors.toList());
+    }
+
+    public List<EpisodioDTO> getMelhoresEpisodios(List<TemporadaDTO> lstTemporadas) {
+
+        List<EpisodioDTO> allEpisodes = lstTemporadas.stream()
+                .flatMap(temp -> temp.lstEpisodios().stream())
+                .collect(Collectors.toList());
+
+        List<EpisodioDTO> betEpisodes = allEpisodes.stream()
+                .filter(e->!e.avaliacao().equalsIgnoreCase("N/A"))
+                .sorted(Comparator.comparing(EpisodioDTO::avaliacao).reversed())
+                .limit(5)
+                .collect(Collectors.toList());
+
+        return betEpisodes;
     }
 
 }

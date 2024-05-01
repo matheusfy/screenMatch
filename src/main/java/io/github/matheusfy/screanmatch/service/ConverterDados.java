@@ -1,10 +1,7 @@
 package io.github.matheusfy.screanmatch.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.matheusfy.screanmatch.model.DadosSerieDTO;
-import io.github.matheusfy.screanmatch.model.enums.tipoPrograma;
 
 import java.io.IOException;
 
@@ -32,5 +29,14 @@ public class ConverterDados implements IConverteDados {
         }
 
         return tipo;
+    }
+
+    public Integer strToInt(String string){
+        try{
+            return Integer.valueOf(string);
+        } catch (NumberFormatException error){
+            System.out.println("Não é possivel realizar a conversão para numero: " + error.getMessage());
+        }
+        return null;
     }
 }
