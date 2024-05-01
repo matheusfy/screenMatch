@@ -1,29 +1,32 @@
-package io.github.matheusfy.screanmatch.model;
+package io.github.matheusfy.screanmatch.model.dtos;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record DadosFilmeDTO(
+public record SerieDTO(
         @JsonAlias("Title") String titulo,
         @JsonAlias("Year") String ano,
-        @JsonAlias("Released") String lancamento,
         @JsonAlias("Runtime") String duracao,
         @JsonAlias("Genre") String genero,
         @JsonAlias("imdbRating") Double avaliacao,
-        @JsonAlias("imdbVotes") String votos
+        @JsonAlias("imdbVotes") String votos,
+        @JsonAlias("Rated") String rate,
+        @JsonAlias("totalSeasons") String totalTemporadas
 ) {
+
     @Override
     public String toString() {
-        String text = """
-                Título: %s
+
+        String saida = """
+                Titulo: %s
                 Ano: %s
-                Lançamento: %s
                 Duração: %s
-                Gênero: %s
+                Genero: %s
                 Avaliação: %.2f
                 Votos: %s
-                """.formatted(titulo,ano,lancamento,duracao,genero,avaliacao,votos);
-        return text;
+                Total de temporadas: %s
+                """.formatted(titulo,ano,duracao,genero,avaliacao,votos,totalTemporadas);
+        return saida;
     }
 }
