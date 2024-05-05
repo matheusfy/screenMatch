@@ -50,26 +50,44 @@ public class ConsumoApi {
         String json = buildAndSendRequest(apiUri);
         String tipo = conversor.getType(json);
 
+
         switch (tipo) {
             case "series" -> {
                 SerieDTO serie = conversor.obterDados(json, SerieDTO.class);
                 System.out.println("Informação serie: " + serie.toString());
                 if (!serie.totalTemporadas().equals("N/A")) {
+                    Scanner scanner = new Scanner(System.in);
+
                     List<TemporadaDTO> lstTemporadas = getTemporadas(apiUri, conversor.strToInt(serie.totalTemporadas()));
                     List<Episodio> episodios = getEpisodios(lstTemporadas);
-                    
-                    //---------------------------- Bloco busca episodio ----------------------------------------
-                    Scanner scanner = new Scanner(System.in);
-                    System.out.println("Deseja buscar um episodio especifico? S/N");
+                    String texto = """
+                            Digite 1 para buscar por um episódio.
+                            Digite 2 para calcular a média de avaliação das temporadas.
+                            Digite 3 para mostrar os 5 melhores episódios da série.
+                            """;
 
-                    if(scanner.nextLine().equals("s")){
-                        System.out.println("Digite o nome do episódio: ");
-                        String  episodioName = scanner.nextLine();
+                    System.out.println(texto);
 
-                        Optional<Episodio> episodio = buscaEpisodio(episodioName, episodios);
-                        episodio.ifPresent(ep -> System.out.println(ep.toString()));
+                    int opcao = scanner.nextInt();
+
+                    switch (opcao){
+                        case 1 ->{
+                                scanner.nextLine(); // flush do buffer
+                                System.out.println("Digite o nome do episódio: ");
+                                String  episodioName = scanner.nextLine();
+
+                                Optional<Episodio> episodio = buscaEpisodio(episodioName, episodios);
+
+                                if (episodio.isPresent()){
+                                    System.out.println(episodio.get().toString());
+                                } else {
+                                    System.out.println("Episódio não encontrado");
+                                }
+                        }
+                        case 2 -> mostrarMediaTemporadas(episodios);
+                        case 3 -> getMelhores5Episodios(lstTemporadas).forEach(System.out::println);
                     }
-                    //--------------------------------------------------------------------------------------------------
+
                 }
             }
             case "movie" -> {
@@ -119,6 +137,14 @@ public class ConsumoApi {
         return episodios.stream()
                 .filter(e -> e.getTitulo().contains(nomeEpisodio))
                 .findFirst();
+    }
+
+    public void mostrarMediaTemporadas(List<Episodio> episodios){
+
+        Map<Integer, Double> mediaTemp = episodios.stream()
+                .collect(Collectors.groupingBy(Episodio::getTemporada, Collectors.averagingDouble(Episodio::getAvaliacao)));
+
+        mediaTemp.forEach((key, value) -> System.out.println("Temporada: " + key + " Avaliação: " + value));
     }
 
 }
