@@ -57,7 +57,19 @@ public class ConsumoApi {
                 if (!serie.totalTemporadas().equals("N/A")) {
                     List<TemporadaDTO> lstTemporadas = getTemporadas(apiUri, conversor.strToInt(serie.totalTemporadas()));
                     List<Episodio> episodios = getEpisodios(lstTemporadas);
-                    System.out.println(episodios);
+                    
+                    //---------------------------- Bloco busca episodio ----------------------------------------
+                    Scanner scanner = new Scanner(System.in);
+                    System.out.println("Deseja buscar um episodio especifico? S/N");
+
+                    if(scanner.nextLine().equals("s")){
+                        System.out.println("Digite o nome do episódio: ");
+                        String  episodioName = scanner.nextLine();
+
+                        Optional<Episodio> episodio = buscaEpisodio(episodioName, episodios);
+                        episodio.ifPresent(ep -> System.out.println(ep.toString()));
+                    }
+                    //--------------------------------------------------------------------------------------------------
                 }
             }
             case "movie" -> {
