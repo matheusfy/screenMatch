@@ -8,30 +8,42 @@ import java.time.format.DateTimeParseException;
 
 public class Episodio {
     private Integer temporada;
+
     private String titulo;
     private Integer  episodio;
     private Double avaliacao;
     private LocalDate dataLancamento;
 
-            public Episodio(Integer temporada, EpisodioDTO episodio){
-                this.temporada = temporada;
-                this.titulo = episodio.titulo();
-                this.episodio = episodio.numero();
+    public Episodio(Integer temporada, EpisodioDTO episodio){
+        this.temporada = temporada;
+        this.titulo = episodio.titulo();
+        this.episodio = episodio.numero();
 
-                try {
-                    this.avaliacao = Double.valueOf(episodio.avaliacao());
-                } catch (NumberFormatException error){
-                    this.avaliacao = 0.0;
-                }
+        try {
+            this.avaliacao = Double.valueOf(episodio.avaliacao());
+        } catch (NumberFormatException error){
+            this.avaliacao = 0.0;
+        }
 
-                try{
-                    this.dataLancamento = LocalDate.parse(episodio.dataLancamento());
-                } catch (DateTimeParseException error) {
-                    this.dataLancamento = null;
-                }
+        try{
+            this.dataLancamento = LocalDate.parse(episodio.dataLancamento());
+        } catch (DateTimeParseException error) {
+            this.dataLancamento = null;
+        }
 
-            }
+    }
 
+    public String getTitulo() {
+        return this.titulo;
+    }
+
+    public Integer getTemporada(){
+        return this.temporada;
+    }
+
+    public Double getAvaliacao(){
+        return this.avaliacao;
+    }
 
     @Override
     public String toString() {
@@ -42,4 +54,6 @@ public class Episodio {
                 ", avaliacao=" + avaliacao +
                 ", dataLancamento=" + dataLancamento;
     }
+
+
 }
