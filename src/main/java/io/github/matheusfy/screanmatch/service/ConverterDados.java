@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class ConverterDados implements IConverteDados {
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public <T> T obterDados(String json, Class<T> classe) {
@@ -20,7 +20,7 @@ public class ConverterDados implements IConverteDados {
 
     public String getType(String json){
 
-        String  tipo = "";
+        String  tipo;
 
         try {
             tipo = mapper.readTree(json).get("Type").asText();
