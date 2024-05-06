@@ -64,6 +64,7 @@ public class ConsumoApi {
                             Digite 1 para buscar por um episódio.
                             Digite 2 para calcular a média de avaliação das temporadas.
                             Digite 3 para mostrar os 5 melhores episódios da série.
+                            Digite 4 para ver estatisticas relacionado a notas dos episódios.
                             """;
 
                     System.out.println(texto);
@@ -86,6 +87,7 @@ public class ConsumoApi {
                         }
                         case 2 -> mostrarMediaTemporadas(episodios);
                         case 3 -> getMelhores5Episodios(lstTemporadas).forEach(System.out::println);
+                        case 4 -> estatisticasGerais(episodios);
                     }
 
                 }
@@ -147,4 +149,18 @@ public class ConsumoApi {
         mediaTemp.forEach((key, value) -> System.out.println("Temporada: " + key + " Avaliação: " + value));
     }
 
+    public void estatisticasGerais(List<Episodio> episodios){
+
+        DoubleSummaryStatistics estatisticaAvaliacao = episodios.stream()
+                .filter(episodio -> episodio.getAvaliacao() > 0.0)
+                .collect(Collectors.summarizingDouble(Episodio::getAvaliacao));
+
+        System.out.println(estatisticaAvaliacao);
+
+        System.out.println("Melhor nota: " + estatisticaAvaliacao.getMax());
+        System.out.println("Pior nota: " + estatisticaAvaliacao.getMin());
+        System.out.println("Média das notas: " + estatisticaAvaliacao.getAverage());
+        System.out.println("Total de avaliações: " + estatisticaAvaliacao.getCount());
+
+    }
 }
