@@ -1,4 +1,4 @@
-package io.github.matheusfy.screanmatch.model;
+package io.github.matheusfy.screanmatch.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.matheusfy.screanmatch.model.dtos.EpisodioDTO;

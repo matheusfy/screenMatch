@@ -1,14 +1,11 @@
 package io.github.matheusfy.screanmatch.service;
 
-import io.github.matheusfy.screanmatch.model.Episodio;
+import io.github.matheusfy.screanmatch.model.entity.Episodio;
 import io.github.matheusfy.screanmatch.model.dtos.EpisodioDTO;
-import io.github.matheusfy.screanmatch.model.dtos.TemporadaDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -61,6 +58,7 @@ class ConsumoApiTest {
 
     assertEquals(episodio2, resultado.get());
     assertNotEquals(episodio1, resultado.get());
+
   }
 
   @Test

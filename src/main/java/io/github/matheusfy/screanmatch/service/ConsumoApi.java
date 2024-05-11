@@ -1,101 +1,80 @@
 package io.github.matheusfy.screanmatch.service;
 
-import io.github.matheusfy.screanmatch.model.Episodio;
+import io.github.matheusfy.screanmatch.http.HttpHandler;
+import io.github.matheusfy.screanmatch.model.entity.Episodio;
 import io.github.matheusfy.screanmatch.model.dtos.EpisodioDTO;
 import io.github.matheusfy.screanmatch.model.dtos.DadosFilmeDTO;
 import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
 import io.github.matheusfy.screanmatch.model.dtos.TemporadaDTO;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConsumoApi {
-    private final HttpClient client;
-    private final ConverterDados conversor;
 
+    private final ConverterDados conversor;
+    HttpHandler httpHandler = new HttpHandler();
     public ConsumoApi(){
-        this.client  = HttpClient.newHttpClient();
         this.conversor  = new ConverterDados();
     }
 
-    private HttpRequest buildRequest(String uri){
-        return HttpRequest.newBuilder().uri(URI.create(uri)).GET().build();
+
+    public String  obterDado(String apiUri){
+        return httpHandler.buildAndSendRequest(apiUri);
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest request){
-        HttpResponse<String> response;
-        try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-        throw new RuntimeException(e);
-    }
-        return response;
+    public void obterDadosFilme(String apiUri){
+
+        String json = obterDado(apiUri);
+        DadosFilmeDTO filme = buscaDados(json, DadosFilmeDTO.class);
+        System.out.println(filme.toString());
     }
 
-    private String buildAndSendRequest(String uri){
-        HttpResponse<String> response = sendRequest(buildRequest(uri));
-        if (response!=null) {
-            return response.body();
+    public SerieDTO obterDadosSerie(String apiUri){
+
+        String  json = obterDado(apiUri);
+        return buscaDados(json, SerieDTO.class);
+
+    }
+
+    public void obterEpisodiosSerie(String apiUri){
+        SerieDTO serie = obterDadosSerie(apiUri);
+        if (!serie.totalTemporadas().equals("N/A")) {
+            Scanner scanner = new Scanner(System.in);
+
+            List<TemporadaDTO> lstTemporadas = getTemporadas(apiUri, conversor.strToInt(serie.totalTemporadas()));
+            List<Episodio> episodios = getEpisodios(lstTemporadas);
+            episodios.forEach(System.out::println);
+
+//            String texto = """
+//                            Digite 1 para buscar por um episódio.
+//                            Digite 2 para calcular a média de avaliação das temporadas.
+//                            Digite 3 para mostrar os 5 melhores episódios da série.
+//                            """;
+//
+//            System.out.println(texto);
+
+//            int opcao = scanner.nextInt();
+
+//            switch (opcao){
+//                case 1 ->{
+//                    scanner.nextLine(); // flush do buffer
+//                    System.out.println("Digite o nome do episódio: ");
+//                    String  episodioName = scanner.nextLine();
+//
+//                    Optional<Episodio> episodio = buscaEpisodio(episodioName, episodios);
+//
+//                    if (episodio.isPresent()){
+//                        System.out.println(episodio.get().toString());
+//                    } else {
+//                        System.out.println("Episódio não encontrado");
+//                    }
+//                }
+//                case 2 -> mostrarMediaTemporadas(episodios);
+//                case 3 -> getMelhores5Episodios(lstTemporadas).forEach(System.out::println);
+//            }
+
         }
-        return "";
-    }
-
-    public void  obterDado(String apiUri){
-
-        String json = buildAndSendRequest(apiUri);
-        String tipo = conversor.getType(json);
-
-
-        switch (tipo) {
-            case "series" -> {
-                SerieDTO serie = conversor.obterDados(json, SerieDTO.class);
-                System.out.println("Informação serie: " + serie.toString());
-                if (!serie.totalTemporadas().equals("N/A")) {
-                    Scanner scanner = new Scanner(System.in);
-
-                    List<TemporadaDTO> lstTemporadas = getTemporadas(apiUri, conversor.strToInt(serie.totalTemporadas()));
-                    List<Episodio> episodios = getEpisodios(lstTemporadas);
-                    String texto = """
-                            Digite 1 para buscar por um episódio.
-                            Digite 2 para calcular a média de avaliação das temporadas.
-                            Digite 3 para mostrar os 5 melhores episódios da série.
-                            """;
-
-                    System.out.println(texto);
-
-                    int opcao = scanner.nextInt();
-
-                    switch (opcao){
-                        case 1 ->{
-                                scanner.nextLine(); // flush do buffer
-                                System.out.println("Digite o nome do episódio: ");
-                                String  episodioName = scanner.nextLine();
-
-                                Optional<Episodio> episodio = buscaEpisodio(episodioName, episodios);
-
-                                if (episodio.isPresent()){
-                                    System.out.println(episodio.get().toString());
-                                } else {
-                                    System.out.println("Episódio não encontrado");
-                                }
-                        }
-                        case 2 -> mostrarMediaTemporadas(episodios);
-                        case 3 -> getMelhores5Episodios(lstTemporadas).forEach(System.out::println);
-                    }
-
-                }
-            }
-            case "movie" -> {
-                DadosFilmeDTO filme = conversor.obterDados(json, DadosFilmeDTO.class);
-                System.out.println(filme.toString());
-            }
-        }
-
     }
 
     public List<TemporadaDTO> getTemporadas(String uri, Integer temporadas){
@@ -103,12 +82,21 @@ public class ConsumoApi {
         List<TemporadaDTO> lstTemporadas = new ArrayList<>();
 
         for(int temporada = 1; temporada <= temporadas; temporada++){
-            String linkTemporada = uri + "&Season=%d";
-            TemporadaDTO temporadaDTO = conversor.obterDados(buildAndSendRequest(linkTemporada.formatted(temporada)), TemporadaDTO.class);
+            String linkTemporada = uri + "&Season=%d".formatted(temporada);
+
+            TemporadaDTO temporadaDTO = buscaDados(getTemporadaBody(linkTemporada), TemporadaDTO.class);
             lstTemporadas.add(temporadaDTO);
         }
-
         return lstTemporadas;
+    }
+
+
+    private <T> T buscaDados(String json, Class<T> classe){
+        return conversor.obterDados(json, classe);
+    }
+
+    private String getTemporadaBody(String uriTemporada){
+        return httpHandler.buildAndSendRequest(uriTemporada);
     }
 
     public List<Episodio> getEpisodios(List<TemporadaDTO> lstTemporadas){
