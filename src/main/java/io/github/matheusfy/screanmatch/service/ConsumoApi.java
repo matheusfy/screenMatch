@@ -18,7 +18,6 @@ public class ConsumoApi {
         this.conversor  = new ConverterDados();
     }
 
-
     public String  obterDado(String apiUri){
         return httpHandler.buildAndSendRequest(apiUri);
     }
@@ -26,25 +25,48 @@ public class ConsumoApi {
     public void obterDadosFilme(String apiUri){
 
         String json = obterDado(apiUri);
-        DadosFilmeDTO filme = buscaDados(json, DadosFilmeDTO.class);
-        System.out.println(filme.toString());
+
+        if(conversor.isValidResponse(json)){
+            DadosFilmeDTO filme = buscaDados(json, DadosFilmeDTO.class);
+            System.out.println(filme.toString());
+        } else {
+            // TODO: Utilizar logger e exception para informar usuario que não foi encontrado a serie buscada
+            System.out.println("Filme não encontrado");
+        }
+
     }
 
-    public SerieDTO obterDadosSerie(String apiUri){
 
-        String  json = obterDado(apiUri);
-        return buscaDados(json, SerieDTO.class);
+    public Optional<SerieDTO> obterDadosSerie(String apiUri){
+        String  json = "";
 
+        json = obterDado(apiUri);
+
+        if ((!json.equals("")) && (conversor.isValidResponse(json))){
+            if(conversor.getType(json).equals("series")){
+                return Optional.ofNullable(buscaDados(json, SerieDTO.class));
+            } else {
+                //TODO: Lança exception avisando usuario que é um filme
+                System.out.println("A série buscada é um filme.");
+                return Optional.empty();
+            }
+        } else {
+            //TODO: Mudar para warning e adicionar uma exception
+            System.out.println("Serie nao encontrada. Verifique o nome digitado.");
+            return Optional.empty();
+        }
     }
 
     public void obterEpisodiosSerie(String apiUri){
-        SerieDTO serie = obterDadosSerie(apiUri);
-        if (!serie.totalTemporadas().equals("N/A")) {
-            Scanner scanner = new Scanner(System.in);
+        Optional<SerieDTO> serie = obterDadosSerie(apiUri);
+        Scanner scanner = new Scanner(System.in);
 
-            List<TemporadaDTO> lstTemporadas = getTemporadas(apiUri, conversor.strToInt(serie.totalTemporadas()));
+        if(serie.isPresent()){
+            List<TemporadaDTO> lstTemporadas = getTemporadas(apiUri, serie.get().totalTemporadas());
             List<Episodio> episodios = getEpisodios(lstTemporadas);
             episodios.forEach(System.out::println);
+        }
+
 
 //            String texto = """
 //                            Digite 1 para buscar por um episódio.
@@ -74,7 +96,6 @@ public class ConsumoApi {
 //                case 3 -> getMelhores5Episodios(lstTemporadas).forEach(System.out::println);
 //            }
 
-        }
     }
 
     public List<TemporadaDTO> getTemporadas(String uri, Integer temporadas){

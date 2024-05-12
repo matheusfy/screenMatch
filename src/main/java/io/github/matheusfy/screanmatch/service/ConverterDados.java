@@ -14,6 +14,7 @@ public class ConverterDados implements IConverteDados {
         try {
             return mapper.readValue(json, classe);
         } catch (IOException e) {
+            // TODO: Trocar a exception por um InvalidFormatException
             throw new RuntimeException(e);
         }
     }
@@ -38,5 +39,15 @@ public class ConverterDados implements IConverteDados {
             System.out.println("Não é possivel realizar a conversão para numero: " + error.getMessage());
         }
         return null;
+    }
+
+    public boolean isValidResponse(String  json){
+
+        try {
+            String response = mapper.readTree(json).get("Response").asText();
+            return Boolean.parseBoolean(response);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

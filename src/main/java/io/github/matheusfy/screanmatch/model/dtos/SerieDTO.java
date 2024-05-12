@@ -12,7 +12,10 @@ public record SerieDTO(
         @JsonAlias("imdbRating") Double avaliacao,
         @JsonAlias("imdbVotes") String votos,
         @JsonAlias("Rated") String rate,
-        @JsonAlias("totalSeasons") String totalTemporadas
+        @JsonAlias("Poster") String poster,
+        @JsonAlias("Plot") String snopse,
+        @JsonAlias("Actors") String atores,
+        @JsonAlias("totalSeasons") Integer totalTemporadas
 ) {
 
     @Override

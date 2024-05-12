@@ -1,6 +1,7 @@
 package io.github.matheusfy.screanmatch.application;
 
 import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
+import io.github.matheusfy.screanmatch.model.entity.Serie;
 import io.github.matheusfy.screanmatch.service.ConsumoApi;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class Principal {
     private final String URI_API = "http://www.omdbapi.com/?";
     private final String API_KEY = "&apikey=35dcfa5c";
 
-    private List<SerieDTO> lstSeriesBuscadas = new ArrayList<>();
+    private List<Serie> lstSeriesBuscadas = new ArrayList<>();
 
 
     public Principal(){
@@ -53,7 +54,7 @@ public class Principal {
         String opcao = "-1";
 
         while(!opcao.equals("0")){
-            System.out.println("1 - Buscar série \n2 - Buscar episódio \n 3 - Lista Séries buscadas\n0 - Sair");
+            System.out.println("1 - Buscar série \n2 - Buscar episódio \n3 - Lista Séries buscadas\n0 - Sair");
             opcao = leitor.nextLine();
 
 
@@ -88,16 +89,20 @@ public class Principal {
     }
 
     private boolean seriePresentOnList(String nomeSerie){
-        Optional<SerieDTO> serieDTO = lstSeriesBuscadas.stream()
-            .filter(serie -> serie.titulo().equals(nomeSerie))
-            .findFirst();
 
-        if(serieDTO.isPresent()){
-            System.out.println("Serie encontrada na lista: " + serieDTO.toString());
-            return true;
-        } else {
-            return false;
+        String nomeSemEspaco = nomeSerie.replace(" ", "");
+
+        try{
+            for(Serie serie: lstSeriesBuscadas){
+                if(serie.getTitulo().toLowerCase().replace(" ", "").equals(nomeSemEspaco)){
+                    System.out.println("Série existente na lista: " + serie.toString());
+                    return true;
+                }
+            }
+        } catch (Exception error){
+            System.out.println("ocorreu um erro inesperado: " + error.getMessage());
         }
+        return false;
     }
 
     private String getNomeSerie(){
@@ -110,15 +115,18 @@ public class Principal {
     }
 
     private void buscarSerie(String uri){
-        SerieDTO serie = api.obterDadosSerie(uri);
-        System.out.println("Informação serie: " + serie.toString());
 
-        if(!lstSeriesBuscadas.contains(serie)){
-            lstSeriesBuscadas.add(serie);
+        Optional<SerieDTO> serieDTO = Optional.empty();
+        try{
+            serieDTO = api.obterDadosSerie(uri);
+        } catch (RuntimeException error){
+
+            System.out.println("Erro na conversão dos dados." + error.getMessage());
         }
-        else{
-            // TODO: Retornar "serie já foi buscada"
-            System.out.println("Serie já foi buscada");
+
+        if(serieDTO.isPresent()){
+            System.out.println("Informação serie: " + serieDTO.get().toString());
+            lstSeriesBuscadas.add(new Serie(serieDTO.get()));
         }
     }
 
