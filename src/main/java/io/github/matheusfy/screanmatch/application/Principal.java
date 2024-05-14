@@ -2,13 +2,14 @@ package io.github.matheusfy.screanmatch.application;
 
 import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
 import io.github.matheusfy.screanmatch.model.entity.Serie;
+import io.github.matheusfy.screanmatch.model.enums.Categoria;
+import io.github.matheusfy.screanmatch.model.enums.tipoPrograma;
 import io.github.matheusfy.screanmatch.service.ConsumoApi;
+import io.github.matheusfy.screanmatch.service.ConverterDados;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
+import io.github.matheusfy.screanmatch.model.enums.tipoPrograma.*;
 
 public class Principal {
 
@@ -17,7 +18,7 @@ public class Principal {
     private final String URI_API = "http://www.omdbapi.com/?";
     private final String API_KEY = "&apikey=35dcfa5c";
 
-    private List<Serie> lstSeriesBuscadas = new ArrayList<>();
+    private final List<Serie> lstSeriesBuscadas = new ArrayList<>();
 
 
     public Principal(){
@@ -57,7 +58,7 @@ public class Principal {
             System.out.println("1 - Buscar série \n2 - Buscar episódio \n3 - Lista Séries buscadas\n0 - Sair");
             opcao = leitor.nextLine();
 
-
+            
             switch (opcao){
                 case "1" ->{
 
@@ -85,7 +86,13 @@ public class Principal {
 
     // FUNÇÕES SÉRIES
     private void listarSeriesBuscadas(){
-        lstSeriesBuscadas.forEach(System.out::println);
+
+        // TODO: criar outro tipo de listagem. Por exemplo: ordem alfabética, mais bem avaliados, com menor temporada etc...
+        System.out.println("Listando por categoria: ");
+
+        lstSeriesBuscadas.stream()
+            .sorted(Comparator.comparing(Serie::getCategoria))
+            .forEach(System.out::println);
     }
 
     private boolean seriePresentOnList(String nomeSerie){
@@ -120,7 +127,6 @@ public class Principal {
         try{
             serieDTO = api.obterDadosSerie(uri);
         } catch (RuntimeException error){
-
             System.out.println("Erro na conversão dos dados." + error.getMessage());
         }
 
