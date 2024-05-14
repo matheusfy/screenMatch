@@ -1,4 +1,4 @@
-package io.github.matheusfy.screanmatch.service;
+package io.github.matheusfy.screanmatch.model.api;
 
 import io.github.matheusfy.screanmatch.http.HttpHandler;
 import io.github.matheusfy.screanmatch.model.entity.Episodio;
@@ -6,16 +6,17 @@ import io.github.matheusfy.screanmatch.model.dtos.EpisodioDTO;
 import io.github.matheusfy.screanmatch.model.dtos.DadosFilmeDTO;
 import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
 import io.github.matheusfy.screanmatch.model.dtos.TemporadaDTO;
+import io.github.matheusfy.screanmatch.service.Conversor;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConsumoApi {
 
-    private final ConverterDados conversor;
+    private final Conversor conversor;
     HttpHandler httpHandler = new HttpHandler();
     public ConsumoApi(){
-        this.conversor  = new ConverterDados();
+        this.conversor  = new Conversor();
     }
 
     public String  obterDado(String apiUri){

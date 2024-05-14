@@ -2,14 +2,10 @@ package io.github.matheusfy.screanmatch.application;
 
 import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
 import io.github.matheusfy.screanmatch.model.entity.Serie;
-import io.github.matheusfy.screanmatch.model.enums.Categoria;
-import io.github.matheusfy.screanmatch.model.enums.tipoPrograma;
-import io.github.matheusfy.screanmatch.service.ConsumoApi;
-import io.github.matheusfy.screanmatch.service.ConverterDados;
+import io.github.matheusfy.screanmatch.model.api.ConsumoApi;
 
 import java.util.*;
 
-import io.github.matheusfy.screanmatch.model.enums.tipoPrograma.*;
 
 public class Principal {
 

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
-public class ConverterDados implements IConverteDados {
+public class Conversor implements IConverteDados {
 
     private final ObjectMapper mapper = new ObjectMapper();
 

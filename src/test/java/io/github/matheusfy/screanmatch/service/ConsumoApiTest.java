@@ -1,5 +1,6 @@
 package io.github.matheusfy.screanmatch.service;
 
+import io.github.matheusfy.screanmatch.model.api.ConsumoApi;
 import io.github.matheusfy.screanmatch.model.entity.Episodio;
 import io.github.matheusfy.screanmatch.model.dtos.EpisodioDTO;
 import org.junit.jupiter.api.BeforeEach;

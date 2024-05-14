@@ -1,5 +1,6 @@
 package io.github.matheusfy.screanmatch.model.entity;
 
+import io.github.matheusfy.screanmatch.model.api.OpenAiApi;
 import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
 import io.github.matheusfy.screanmatch.model.enums.Categoria;
 
@@ -17,7 +18,7 @@ public class Serie {
     private Integer totalTemporadas;
     private String poster;
     private String atores;
-    private String snopse;
+    private String sinopse;
 
     public Serie(SerieDTO serie){
         this.titulo             = serie.titulo();
@@ -38,7 +39,7 @@ public class Serie {
         this.votos              = serie.votos();
         this.rate                = serie.rate();
         this.poster            = serie.poster();
-        this.snopse           = serie.snopse();
+        this.sinopse = OpenAiApi.obterTraducao(serie.sinopse());
         this.atores            = serie.atores();
         this.totalTemporadas = serie.totalTemporadas();
     }
@@ -124,11 +125,11 @@ public class Serie {
     }
 
     public String getSnopse() {
-        return snopse;
+        return sinopse;
     }
 
     public void setSnopse(String snopse) {
-        this.snopse = snopse;
+        this.sinopse = snopse;
     }
 
     @Override
@@ -139,6 +140,6 @@ public class Serie {
             ", categoria=" + categoria +
             ", avaliacao=" + avaliacao +
             ", totalTemporadas=" + totalTemporadas +
-            ", snopse='" + snopse + '\'';
+            ", sinopse='" + sinopse + '\'';
     }
 }

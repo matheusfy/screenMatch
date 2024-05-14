@@ -13,7 +13,7 @@ public record SerieDTO(
         @JsonAlias("imdbVotes") String votos,
         @JsonAlias("Rated") String rate,
         @JsonAlias("Poster") String poster,
-        @JsonAlias("Plot") String snopse,
+        @JsonAlias("Plot") String sinopse,
         @JsonAlias("Actors") String atores,
         @JsonAlias("totalSeasons") Integer totalTemporadas
 ) {
