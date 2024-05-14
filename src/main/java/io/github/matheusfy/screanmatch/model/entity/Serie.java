@@ -23,7 +23,17 @@ public class Serie {
         this.titulo             = serie.titulo();
         this.ano                = serie.ano();
         this.duracao        = serie.duracao();
-        this.categoria      = Categoria.fromString(serie.genero().split(",")[0].trim());
+
+        for(String categoria: serie.genero().split(",")) {
+            try {
+                this.categoria = Categoria.fromString(categoria.trim());
+                break;
+            } catch (Exception error){
+                //TODO: Logar como warning para gerar uma tarefa para mapear a categoria. *nada critico*
+                System.out.println("Categoria não mapeada: " + categoria);
+             }
+        }
+
         this.avaliacao      = OptionalDouble.of(serie.avaliacao()).orElse(0.0);
         this.votos              = serie.votos();
         this.rate                = serie.rate();
