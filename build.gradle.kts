@@ -22,6 +22,13 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.12.5")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.12.5")
 
+    // OpenAi
+    implementation("com.theokanning.openai-gpt3-java:service:0.14.0")
+
+    // Database
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    runtimeOnly("org.postgresql:postgresql")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

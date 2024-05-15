@@ -3,9 +3,9 @@ package io.github.matheusfy.screanmatch.application;
 import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
 import io.github.matheusfy.screanmatch.model.entity.Serie;
 import io.github.matheusfy.screanmatch.model.api.ConsumoApi;
+import io.github.matheusfy.screanmatch.model.repository.SerieRepository;
 
 import java.util.*;
-
 
 public class Principal {
 
@@ -14,12 +14,14 @@ public class Principal {
     private final String URI_API = "http://www.omdbapi.com/?";
     private final String API_KEY = "&apikey=35dcfa5c";
 
-    private final List<Serie> lstSeriesBuscadas = new ArrayList<>();
+    private final SerieRepository serieRepository;
 
 
-    public Principal(){
+    public Principal(SerieRepository serieRepository){
+        this.serieRepository = serieRepository;
         this.leitor = new Scanner(System.in);
     }
+
 
     public void exibeMenu(){
 
@@ -30,18 +32,14 @@ public class Principal {
             opcao = leitor.nextLine();
 
             switch (opcao){
-                case "1" ->{
-                    exibeMenuSerie();
-                }
+                case "1" -> exibeMenuSerie();
                 case "2" ->{
 
                     System.out.println("Digite o nome do filme: ");
                     buscarFilme(buildUri(leitor.nextLine()));
                 }
 
-                case "0" -> {
-                    System.out.println("Saindo do menu principal");
-                }
+                case "0" -> System.out.println("Saindo do menu principal");
             }
         }
     }
@@ -51,7 +49,7 @@ public class Principal {
         String opcao = "-1";
 
         while(!opcao.equals("0")){
-            System.out.println("1 - Buscar série \n2 - Buscar episódio \n3 - Lista Séries buscadas\n0 - Sair");
+            System.out.println("1 - Buscar série \n2 - Buscar episódio \n3 - Lista Séries buscadas \n4 - pega a primeira seria do banco\n0 - Sair");
             opcao = leitor.nextLine();
 
             
@@ -68,13 +66,9 @@ public class Principal {
                     buscaEpisodioSerie(getUriSerie(nomeSerie));
                 }
 
-                case "3" -> {
-                    listarSeriesBuscadas();
-                }
+                case "3" -> listarSeriesBuscadas();
 
-                case "0" -> {
-                    System.out.println("Saindo do menu de série");
-                }
+                case "0" -> System.out.println("Saindo do menu de série");
             }
         }
 
@@ -86,26 +80,20 @@ public class Principal {
         // TODO: criar outro tipo de listagem. Por exemplo: ordem alfabética, mais bem avaliados, com menor temporada etc...
         System.out.println("Listando por categoria: ");
 
-        lstSeriesBuscadas.stream()
+        serieRepository.findAll().stream()
             .sorted(Comparator.comparing(Serie::getCategoria))
             .forEach(System.out::println);
     }
 
-    private boolean seriePresentOnList(String nomeSerie){
+    private boolean seriePresentOnList(String titulo){
 
-        String nomeSemEspaco = nomeSerie.replace(" ", "");
-
-        try{
-            for(Serie serie: lstSeriesBuscadas){
-                if(serie.getTitulo().toLowerCase().replace(" ", "").equals(nomeSemEspaco)){
-                    System.out.println("Série existente na lista: " + serie.toString());
-                    return true;
-                }
-            }
-        } catch (Exception error){
-            System.out.println("ocorreu um erro inesperado: " + error.getMessage());
+        Optional<Serie> serie = serieRepository.findByTituloIgnoreCase(titulo.trim());
+        if (serie.isPresent()){
+            System.out.println(serie.get());
+            return true;
+        } else{
+            return false;
         }
-        return false;
     }
 
     private String getNomeSerie(){
@@ -127,8 +115,12 @@ public class Principal {
         }
 
         if(serieDTO.isPresent()){
-            System.out.println("Informação serie: " + serieDTO.get().toString());
-            lstSeriesBuscadas.add(new Serie(serieDTO.get()));
+            System.out.println("Informação serie: " + serieDTO.get());
+
+            Serie serie = new Serie(serieDTO.get());
+
+            //Adiciona no banco
+            serieRepository.save(serie);
         }
     }
 
