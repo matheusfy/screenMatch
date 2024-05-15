@@ -3,14 +3,23 @@ package io.github.matheusfy.screanmatch.model.entity;
 import io.github.matheusfy.screanmatch.model.api.OpenAiApi;
 import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
 import io.github.matheusfy.screanmatch.model.enums.Categoria;
+import jakarta.persistence.*;
 
 import java.util.OptionalDouble;
 
+
+@Entity
+@Table(name = "series")
 public class Serie {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(unique = true, nullable = false)
     private String titulo;
     private String ano;
     private String duracao;
+    @Enumerated(EnumType.STRING)
     private Categoria categoria;
     private Double avaliacao;
     private String votos;
@@ -19,6 +28,7 @@ public class Serie {
     private String poster;
     private String atores;
     private String sinopse;
+
 
     public Serie(SerieDTO serie){
         this.titulo             = serie.titulo();
@@ -42,6 +52,19 @@ public class Serie {
         this.sinopse = OpenAiApi.obterTraducao(serie.sinopse());
         this.atores            = serie.atores();
         this.totalTemporadas = serie.totalTemporadas();
+    }
+
+    public Serie() {
+
+    }
+
+    //*************** Init Getter and setters **********************//
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getTitulo() {
@@ -132,6 +155,7 @@ public class Serie {
         this.sinopse = snopse;
     }
 
+    //***************** End Getters and Setters *********************
     @Override
     public String toString() {
         return "titulo='" + titulo + '\'' +
@@ -142,4 +166,5 @@ public class Serie {
             ", totalTemporadas=" + totalTemporadas +
             ", sinopse='" + sinopse + '\'';
     }
+
 }
