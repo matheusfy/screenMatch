@@ -16,11 +16,17 @@ public enum Categoria {
 
     public static Categoria fromString(String text) {
         for (Categoria categoria : Categoria.values()) {
-            if (categoria.categoriaOmdb.equalsIgnoreCase(text)) {
+            if (categoria.categoriaOmdb.equalsIgnoreCase(text) || categoria.toString().equalsIgnoreCase(text)) {
                 return categoria;
             }
         }
         throw new IllegalArgumentException("Nenhuma categoria encontrada para a string fornecida: " + text);
+    }
+
+    public static void listarCategoria(){
+        for(Categoria categoria: Categoria.values()){
+            System.out.println(categoria);
+        }
     }
 
 }
