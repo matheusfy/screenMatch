@@ -7,9 +7,9 @@ spring:
       WRITE_DATES_AS_TIMESTAMPS: false  main:
     web-application-type: none
   datasource:
-    username: postgres
-    password: 1234
-    url: jdbc:postgresql://localhost:5432/screen_match
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

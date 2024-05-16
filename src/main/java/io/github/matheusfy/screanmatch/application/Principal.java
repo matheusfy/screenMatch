@@ -3,25 +3,24 @@ package io.github.matheusfy.screanmatch.application;
 import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
 import io.github.matheusfy.screanmatch.model.entity.Serie;
 import io.github.matheusfy.screanmatch.model.api.ConsumoApi;
+import io.github.matheusfy.screanmatch.model.enums.Categoria;
 import io.github.matheusfy.screanmatch.model.repository.SerieRepository;
 
+import java.io.IOException;
 import java.util.*;
 
 public class Principal {
 
     private final Scanner leitor;
     private final ConsumoApi api = new ConsumoApi();
-    private final String URI_API = "http://www.omdbapi.com/?";
-    private final String API_KEY = "&apikey=35dcfa5c";
-
     private final SerieRepository serieRepository;
-
+    private String API_KEY = "&apikey=%s";
 
     public Principal(SerieRepository serieRepository){
         this.serieRepository = serieRepository;
         this.leitor = new Scanner(System.in);
+        this.API_KEY = API_KEY.formatted(System.getenv("OMDB_APIKEY"));
     }
-
 
     public void exibeMenu(){
 
@@ -136,6 +135,8 @@ public class Principal {
     // FUNÇÕES UTILIDADES
     private String buildUri(String nomePrograma){
         // Trata os espaços digitados pelo usuario
-        return URI_API + "t=" + nomePrograma.replace(" ", "+") + API_KEY;
+        String OMDB_URI = "http://www.omdbapi.com/?";
+        return OMDB_URI + "t=" + nomePrograma.replace(" ", "+") + API_KEY;
+    }
     }
 }
