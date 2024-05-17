@@ -1,16 +1,29 @@
 package io.github.matheusfy.screanmatch.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.matheusfy.screanmatch.model.dtos.EpisodioDTO;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+@Entity
+@Table(name = "episodios")
 public class Episodio {
-    private Integer temporada;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+
+    @ManyToOne
+    @JoinColumn(name = "serie_id", nullable = false)
+    private Serie serie;
+
+    @Column(unique = true, nullable = false)
     private String titulo;
+
     private Integer  episodio;
+    private Integer temporada;
     private Double avaliacao;
     private LocalDate dataLancamento;
 
@@ -31,6 +44,18 @@ public class Episodio {
             this.dataLancamento = null;
         }
 
+    }
+
+    public Episodio() {
+
+    }
+
+    public Serie getSerie() {
+        return serie;
+    }
+
+    public void setSerie(Serie serie) {
+        this.serie = serie;
     }
 
     public String getTitulo() {
@@ -56,4 +81,11 @@ public class Episodio {
     }
 
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }
