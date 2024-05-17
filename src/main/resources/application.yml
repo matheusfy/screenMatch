@@ -5,8 +5,8 @@ spring:
     date-format: io.swagger.RFC3339DateFormat
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
-    main:
-      web-application-type: none
+  main:
+    web-application-type: none
   datasource:
     username: ${DB_USER}
     password: ${DB_PASSWORD}

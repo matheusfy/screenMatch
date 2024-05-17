@@ -5,6 +5,8 @@ import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
 import io.github.matheusfy.screanmatch.model.enums.Categoria;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.OptionalDouble;
 
 
@@ -28,6 +30,10 @@ public class Serie {
     private String poster;
     private String atores;
     private String sinopse;
+
+
+    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL)
+    private List<Episodio> episodios = new ArrayList<>();
 
 
     public Serie(SerieDTO serie){
@@ -59,6 +65,17 @@ public class Serie {
     }
 
     //*************** Init Getter and setters **********************//
+
+
+    public List<Episodio> getEpisodios() {
+        return episodios;
+    }
+
+    public void setEpisodios(List<Episodio> episodios) {
+        episodios.forEach(episodio -> episodio.setSerie(this));
+        this.episodios = episodios;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

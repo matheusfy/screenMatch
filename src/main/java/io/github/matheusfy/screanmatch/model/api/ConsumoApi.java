@@ -58,15 +58,17 @@ public class ConsumoApi {
         }
     }
 
-    public void obterEpisodiosSerie(String apiUri){
+    public List<Episodio> obterEpisodiosSerie(String apiUri){
         Optional<SerieDTO> serie = obterDadosSerie(apiUri);
-        Scanner scanner = new Scanner(System.in);
 
         if(serie.isPresent()){
             List<TemporadaDTO> lstTemporadas = getTemporadas(apiUri, serie.get().totalTemporadas());
             List<Episodio> episodios = getEpisodios(lstTemporadas);
-            episodios.forEach(System.out::println);
+//            episodios.forEach(System.out::println);
+            return episodios;
         }
+
+        return null;
 
 
 //            String texto = """
