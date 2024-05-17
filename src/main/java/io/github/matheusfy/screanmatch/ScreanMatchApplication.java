@@ -18,7 +18,6 @@ public class ScreanMatchApplication implements CommandLineRunner {
     @Autowired
     private EpisodioRepository episodioRepository;
 
-
     public static void main(String[] args) {
         SpringApplication.run(ScreanMatchApplication.class, args);
     }
