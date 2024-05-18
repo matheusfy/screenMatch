@@ -1,0 +1,207 @@
+package io.github.matheusfy.screanmatch.application;
+
+import io.github.matheusfy.screanmatch.model.api.ConsumoApi;
+import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
+import io.github.matheusfy.screanmatch.model.entity.Episodio;
+import io.github.matheusfy.screanmatch.model.entity.Serie;
+import io.github.matheusfy.screanmatch.model.enums.Categoria;
+import io.github.matheusfy.screanmatch.model.repository.EpisodioRepository;
+import io.github.matheusfy.screanmatch.model.repository.SerieRepository;
+
+import java.lang.invoke.StringConcatException;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
+
+import static io.github.matheusfy.screanmatch.application.Principal.buildUri;
+import static io.github.matheusfy.screanmatch.model.enums.Categoria.listarCategoria;
+
+public class MenuSerie {
+
+    private final SerieRepository serieRepository;
+    private final EpisodioRepository episodioRepository;
+    private final Scanner cmd;
+    private final ConsumoApi api;
+
+    public MenuSerie(SerieRepository serieRepository, EpisodioRepository episodioRepository, Scanner cmd, ConsumoApi api){
+        this.api = api;
+        this.cmd = cmd;
+        this.serieRepository = serieRepository;
+        this.episodioRepository = episodioRepository;
+    }
+
+    public void exibeMenuSerie(){
+
+        String opcao = "-1";
+        String menu = """
+            1 - Buscar série na web\s
+            2 - Buscar episódio\s
+            3 - Lista séries buscadas\s
+            4 - Buscar série por título\s
+            5 - Buscar série por atores\s
+            7 - Buscar série por categoria\s
+            0 - Sair
+            """;
+        while(!opcao.equals("0")){
+            System.out.println(menu);
+            opcao = cmd.nextLine();
+
+            switch (opcao){
+                case "1" ->{
+                    buscarSerieNaWeb(getUriSerie(getNomeSerie()));
+                }
+                case "2" ->{
+                    String nomeSerie = getNomeSerie();
+                    buscaEpisodioPorSerie(nomeSerie);
+                }
+                case "3" -> listarSeriesBuscadas();
+                case "4" -> buscarSeriePorTitulo();
+                case "5" -> buscarSeriePorAtor();
+
+
+                case "7" -> buscarSeriesPorCategoria();
+                case "0" -> System.out.println("Saindo do menu de série");
+            }
+        }
+
+    }
+
+    private void buscarSeriesPorCategoria(){
+        System.out.println("Categorias possíveis: " );
+        listarCategoria();
+
+        System.out.println("Digite uma categoria: ");
+        String categoria = cmd.nextLine();
+
+        try {
+            List<Serie> seriesCategoria = serieRepository.findByCategoria(Categoria.fromString(categoria));
+            if(!seriesCategoria.isEmpty()){
+                seriesCategoria.forEach(System.out::println);
+            } else {
+                System.out.printf("Série não encontrada para categoria %s%n", categoria);
+            }
+        } catch (Exception error){
+            System.out.println("Não foi possivel obter a lista. Erro: " + error.getMessage());
+        }
+    }
+
+    private Optional<Serie> seriePresentOnList(String titulo){
+        Optional<Serie> serie = serieRepository.findByTituloIgnoreCase(titulo.trim());
+        serie.ifPresent(System.out::println);
+        return serie;
+    }
+
+    private String getNomeSerie(){
+        System.out.println("Digite o nome da série: ");
+        return cmd.nextLine();
+    }
+
+    private String getUriSerie(String nome){
+        return buildUri(nome);
+    }
+
+    private Serie buscarSerieNaWeb(String uri){
+
+        Optional<SerieDTO> serieDTO = Optional.empty();
+        Serie serieBuscada = null;
+        try{
+            serieDTO = api.obterDadosSerie(uri);
+        } catch (RuntimeException error){
+            System.out.println("Erro na conversão dos dados." + error.getMessage());
+        }
+
+        if(serieDTO.isPresent()){
+            System.out.println("Informação serie: " + serieDTO.get());
+            // Verificar se a série retornada não existe realmente no banco
+            Optional<Serie> serie =  seriePresentOnList(serieDTO.get().titulo());
+            if(serie.isEmpty()){
+                serieBuscada = saveSerieToDB(new Serie(serieDTO.get()));
+            } else {
+                System.out.println("API nos retornou uma série que já existe no nosso banco");
+                serieBuscada = serie.get();
+            }
+        }
+        return serieBuscada;
+    }
+
+    private Serie saveSerieToDB(Serie serie){
+        return serieRepository.save(serie);
+    }
+
+    private void buscaEpisodioPorSerie(String nomeSerie){
+
+
+        Optional<Serie> serie = seriePresentOnList(nomeSerie);
+
+        if(serie.isPresent()){
+            Serie serieEncontrada = serie.get();
+            System.out.println("Buscando episodios no banco. Serie id: " + serieEncontrada.getId());
+            TryGetAndSaveEpisodes(serieEncontrada, nomeSerie);
+        } else {
+            System.out.println("Ainda nao temos informações sobre esta série. Obtendo mais informações...");
+            serie = Optional.ofNullable(buscarSerieNaWeb(getUriSerie(nomeSerie)));
+
+            if(serie.isPresent()){
+                Serie serieBuscada = serie.get();
+                TryGetAndSaveEpisodes(serieBuscada,nomeSerie);
+            }
+        }
+    }
+
+    private void TryGetAndSaveEpisodes(Serie serie, String nomeSerie){
+        List<Episodio> episodios;
+        episodios = episodioRepository.findBySerieId(serie.getId());
+        if(episodios.isEmpty()){
+            // Não encontramos episodios da série no banco. Buscamos na web
+            getEpisodesAndSave(serie, nomeSerie);
+        } else {
+            System.out.println("Encontramos episodios disponíveis para esta série no banco.");
+            episodios.forEach(System.out::println);
+        }
+    }
+
+    private void getEpisodesAndSave(Serie serie, String nomeSerie){
+        List<Episodio> episodios;
+        episodios = api.obterEpisodiosSerie(getUriSerie(nomeSerie));
+        saveEpisodesToDB(episodios, serie);
+        episodios.forEach(System.out::println);
+    }
+
+    private void saveEpisodesToDB(List<Episodio> episodios, Serie serie){
+        serie.setEpisodios(episodios);
+        episodioRepository.saveAllAndFlush(episodios);
+    }
+
+    private void listarSeriesBuscadas(){
+        serieRepository.findAll().stream()
+            .sorted(Comparator.comparing(Serie::getCategoria))
+            .forEach(System.out::println);
+    }
+
+    private void buscarSeriePorTitulo(){
+        System.out.println("Digite o algo contido no nome da serie para buscar: ");
+        String palavra = cmd.nextLine();
+
+        List<Serie> series = serieRepository.findByTituloContainingIgnoreCase(palavra);
+        showListSeries(series, "Serie não encontrada com a palavra: ".formatted(palavra));
+    }
+
+    private void buscarSeriePorAtor() {
+        System.out.println("Digite o nome do autor para buscar séries: ");
+        String nomeAutor = cmd.nextLine();
+
+        List<Serie> series = serieRepository.findByAtoresContainingIgnoreCase(nomeAutor);
+        showListSeries(series, "Nenhuma série encontrada com o ator: ".formatted(nomeAutor));
+    }
+
+    private void showListSeries(List<Serie> series, String notFindMsg){
+        if(series.isEmpty()){
+            System.out.println(notFindMsg);
+        } else {
+            System.out.println("Series encontradas: ");
+            series.forEach(System.out::println);
+        }
+    }
+
+}

@@ -28,5 +28,4 @@ public enum Categoria {
             System.out.println(categoria);
         }
     }
-
 }
