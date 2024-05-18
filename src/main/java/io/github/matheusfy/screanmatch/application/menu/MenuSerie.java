@@ -1,4 +1,4 @@
-package io.github.matheusfy.screanmatch.application;
+package io.github.matheusfy.screanmatch.application.menu;
 
 import io.github.matheusfy.screanmatch.model.api.ConsumoApi;
 import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
@@ -40,7 +40,8 @@ public class MenuSerie {
             3 - Lista séries buscadas\s
             4 - Buscar série por título\s
             5 - Buscar série por atores\s
-            7 - Buscar série por categoria\s
+            6 - Buscar série por categoria\s
+            7 - Buscar as melhor 5 séries avaliadas\s
             0 - Sair
             """;
         while(!opcao.equals("0")){
@@ -58,13 +59,22 @@ public class MenuSerie {
                 case "3" -> listarSeriesBuscadas();
                 case "4" -> buscarSeriePorTitulo();
                 case "5" -> buscarSeriePorAtor();
-
-
-                case "7" -> buscarSeriesPorCategoria();
+                case "6" -> buscarSeriesPorCategoria();
+                case "7" -> buscarTop5Series();
                 case "0" -> System.out.println("Saindo do menu de série");
             }
         }
 
+    }
+
+    private void buscarTop5Series() {
+
+        List<Serie> series = serieRepository.findTop5ByOrderByAvaliacaoDesc();
+        if(!series.isEmpty()){
+            series.forEach(System.out::println);
+        } else {
+            System.out.println("Não temos nenhuma série no nosso banco de dados");
+        }
     }
 
     private void buscarSeriesPorCategoria(){
@@ -75,7 +85,7 @@ public class MenuSerie {
         String categoria = cmd.nextLine();
 
         try {
-            List<Serie> seriesCategoria = serieRepository.findByCategoria(Categoria.fromString(categoria));
+            List<Serie> seriesCategoria = serieRepository.findByCategoria(Categoria.fromPortugues(categoria));
             if(!seriesCategoria.isEmpty()){
                 seriesCategoria.forEach(System.out::println);
             } else {

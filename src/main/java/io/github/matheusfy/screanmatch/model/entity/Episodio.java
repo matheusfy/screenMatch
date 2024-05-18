@@ -80,7 +80,6 @@ public class Episodio {
                 ", dataLancamento=" + dataLancamento;
     }
 
-
     public void setId(Long id) {
         this.id = id;
     }

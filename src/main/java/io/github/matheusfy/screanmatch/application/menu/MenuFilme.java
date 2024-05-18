@@ -1,4 +1,4 @@
-package io.github.matheusfy.screanmatch.application;
+package io.github.matheusfy.screanmatch.application.menu;
 
 import io.github.matheusfy.screanmatch.model.api.ConsumoApi;
 import io.github.matheusfy.screanmatch.model.repository.FilmeRepository;
