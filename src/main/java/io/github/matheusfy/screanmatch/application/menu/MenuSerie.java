@@ -42,6 +42,7 @@ public class MenuSerie {
             5 - Buscar série por atores\s
             6 - Buscar série por categoria\s
             7 - Buscar as melhor 5 séries avaliadas\s
+            8 - Busque uma série pela temporada e pela avaliação\s
             0 - Sair
             """;
         while(!opcao.equals("0")){
@@ -61,6 +62,7 @@ public class MenuSerie {
                 case "5" -> buscarSeriePorAtor();
                 case "6" -> buscarSeriesPorCategoria();
                 case "7" -> buscarTop5Series();
+                case "8" -> buscarSeriePorTemporadaEAvaliacao();
                 case "0" -> System.out.println("Saindo do menu de série");
             }
         }
@@ -214,4 +216,21 @@ public class MenuSerie {
         }
     }
 
+    private void buscarSeriePorTemporadaEAvaliacao() {
+        System.out.println("Digite uma avaliação mínima: ");
+        Double avaliacao = cmd.nextDouble();
+        cmd.nextLine();
+
+        System.out.println("Digite uma temporada máxima: ");
+        Integer temporada = cmd.nextInt();
+        cmd.nextLine();
+
+        List<Serie> series = serieRepository.findByTemporadaAndAvaliacao(temporada, avaliacao);
+        if(!series.isEmpty()){
+            System.out.println("Séries encontradas: ");
+            series.forEach(serie -> System.out.printf("Serie: %s - Avaliação: %.2f - Temporadas: %d%n", serie.getTitulo(), serie.getAvaliacao(), serie.getTotalTemporadas()));
+        } else {
+            System.out.println("Nenhuma série encontradas");
+        }
+    }
 }
