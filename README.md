@@ -1,5 +1,5 @@
 
-![Thumbnail GitHub](https://user-images.githubusercontent.com/8989346/123303345-171fc980-d4f4-11eb-84ae-cb0e49bfb126.png)
+![Thumbnail GitHub](./src/img/Java%20-%20Spring%20Data%20JPA.png)
 
 
 
@@ -7,7 +7,9 @@
 
 Este projeto busca filmes, séries e episódios na api da omdb e mostra informações a usuários. Realiza a persistência dessas informações no banco local e disponibiliza um histórico de séries buscadas para o usuários.
 
+
 ## ⚙️ Configuração do projeto
+
 
 Para configurar o projeto, siga as etapas abaixo:
 
@@ -24,13 +26,18 @@ Para configurar o projeto, siga as etapas abaixo:
   3. Configuração de variáveis de ambiente:
 
      - `OPENAI_TOKEN`: gere seu próprio token em [OpenAi Website](https://openai.com/)
-     - `DB_NAME`: Atribua o nome do seu banco de dados ex: 'postgresql'
-     - `DB_USER`: Atribua o nome do seu user do banco ex: 'postgres'
-     - `DB_PASSWORD`: senha utilizado para acessar o banco
-     - `DB_HOST`: O host para acessar o banco ex: 'localhost'
-     - `DB_PORT`: A porta para acessar seu banco de dados: 5432
+     - `DB_NAME`: Atribua o nome do seu banco de dados ex: '**postgresql**'
+     - `DB_USER`: Atribua o nome do seu user do banco ex: '**postgres**'
+     - `DB_PASSWORD`: senha utilizado para acessar a base de dados criada.
+     - `DB_HOST`: O host para acessar o banco ex: '**localhost**'
+     - `DB_PORT`: A porta para acessar seu banco de dados: **5432**
      - `OMDB_APIKEY`: obtenha sua key da API da omdb em: [omdbapi](https://omdbapi.com/apikey.aspx)
 
+
+  4. Configure para que o projeto seja compilado utilizando Java 17
+
+  5. Utilizando o banco de dados `postgres`, caso seja a sua primeira vez, crie usuário e uma senha para acesso e uma base de dados. 
+   ![banco de dados](./src/img/db.png)
 
 ## 🔨 Funcionalidades do projeto
 
@@ -55,13 +62,6 @@ Se possível, apresente um exemplo visual do projeto, seja gif, imagens ou víde
 - `Funcionalidade 2`: Menu com opções de busca de informações de filmes.
   - `Funcionalidade 2a`: descrição da funcionalidade 2a relacionada à funcionalidade 2
 
-
-
-
-  Certifique-se de ter o Node.js instalado em sua máquina antes de executar o projeto.
-
-  Após seguir essas etapas, o projeto estará configurado e em execução.
-
 ## ✔️ Técnicas e tecnologias utilizadas
 - `Java`: Versão 17
 - `dependências:`
@@ -81,17 +81,28 @@ Para acessar o repositório do projeto clique em -> [Repositório](https://githu
 
 ### Rodando no Intellij:
 
+- 1. Acesse o arquivo de build do gradle `build.gradle.kts` na pasta raiz do projeto e verifique a necessidade de carregamento das dependências: 
+
+![gradle update](./src/img/image-1.png)
+
+- 2. Verifique se seu ambiente foi configurado adequadamente com os passos [configuração](#️-configuração-do-projeto)
+
+- 3. Configure de forma que o intellij execute o arquivo `"ScreanMatchApplication"`
+  
+  ![acessando configurações](./src/img/image.png)
+
+- 4. Sete as seguintes configurações. Obs: Você pode adicionar as variáveis de ambiente dentro da IDE:
+
+![Run config](./src/img/image-2.png)
+
+- 5. Não esqueça de verificar a configuração da IDE se a configuração de build para arquivos em java está adequada para a versão o qual estamos trabalhando.
 
 ### Rodando no VsCode:
 
-1. Abra o projeto no intellij.
-2. 
-3. Build a dependencia 
+    Em desenvolvimento
 
-![alt text](image.png)
 
-**Apresente as instruções necessárias para abrir e executar o projeto**
 
 ## 📚 Mais informações do curso
 
-**Faça um CTA (_call to action_) para o curso do projeto**
+Projetinho desenvolvido ao longo do curso oferecido pela Alura: [Link curso - Java: persistência de dados e consultas com Spring Data JPA](https://cursos.alura.com.br/course/java-persistencia-dados-consultas-spring-data-jpa)
