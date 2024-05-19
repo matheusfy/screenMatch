@@ -43,6 +43,8 @@ public class MenuSerie {
             6 - Buscar série por categoria\s
             7 - Buscar as melhor 5 séries avaliadas\s
             8 - Busque uma série pela temporada e pela avaliação\s
+            9 - Buscar episódio por trecho \s
+            10 - Buscar top 5 episodios \s
             0 - Sair
             """;
         while(!opcao.equals("0")){
@@ -63,6 +65,8 @@ public class MenuSerie {
                 case "6" -> buscarSeriesPorCategoria();
                 case "7" -> buscarTop5Series();
                 case "8" -> buscarSeriePorTemporadaEAvaliacao();
+                case "9" -> buscarEpisodioPorTrecho();
+                case "10" -> buscarTop5Episodios();
                 case "0" -> System.out.println("Saindo do menu de série");
             }
         }
@@ -233,4 +237,43 @@ public class MenuSerie {
             System.out.println("Nenhuma série encontradas");
         }
     }
+
+    private void buscarEpisodioPorTrecho() {
+        System.out.println("Digite um trecho do episódio a ser buscado");
+        String trecho = cmd.nextLine();
+
+        try{
+            List<Episodio> episodios = episodioRepository.findEpisodioPorTrecho(trecho);
+
+            if(!episodios.isEmpty()){
+                episodios.forEach(e ->
+                    System.out.println("Serie: %s - Temporada: %d - Episodio: %d - %s"
+                        .formatted(e.getSerie().getTitulo(), e.getTemporada(), e.getId(), e.getTitulo())));
+            } else {
+                System.out.println("Não encontramos nenhum episódio com o trecho: " + trecho);
+            }
+        } catch (Exception error){
+            System.out.println("Erro na tentativa de obter episodios: " + error.getMessage());
+        }
+
+    }
+
+    private void buscarTop5Episodios() {
+        System.out.println("Informe uma série pra buscar os melhores episódios: ");
+        String nomeSerie = cmd.nextLine();
+
+        List<Episodio> episodios = episodioRepository.findTop5BySerieOrderByAvaliacaoDesc(nomeSerie);
+        if(!episodios.isEmpty()){
+            episodios.forEach(e -> {
+                System.out.println("Avaliacao: %.2f - Temporada: %d - Episodio: %d - Titulo: %s".formatted(
+                    e.getAvaliacao() , e.getTemporada(), e.getId(), e.getTitulo()));
+            });
+        } else {
+            System.out.println("Nenhuma série encontrada. Série buscada: " + nomeSerie);
+        }
+
+    }
+
+
+
 }
