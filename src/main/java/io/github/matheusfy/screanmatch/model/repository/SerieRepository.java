@@ -3,6 +3,7 @@ package io.github.matheusfy.screanmatch.model.repository;
 import io.github.matheusfy.screanmatch.model.entity.Serie;
 import io.github.matheusfy.screanmatch.model.enums.Categoria;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,4 +21,8 @@ public interface SerieRepository extends JpaRepository<Serie, Long> {
 	List<Serie> findByAtoresContainingIgnoreCase(String nomeAtor);
 
 	List<Serie> findTop5ByOrderByAvaliacaoDesc();
+
+	@Query(value = "select * from series where total_temporadas <= ?1 and avaliacao >= ?2", nativeQuery = true)
+	List<Serie> findByTemporadaAndAvaliacao(Integer temporada, Double avaliacao);
+
 }
