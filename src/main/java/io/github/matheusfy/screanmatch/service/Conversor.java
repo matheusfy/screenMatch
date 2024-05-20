@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class Conversor implements IConverteDados {
 
@@ -49,5 +52,13 @@ public class Conversor implements IConverteDados {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static LocalDate omdbDateToLocalDate(String omdbDate){
+        return LocalDate.parse(omdbDate, DateTimeFormatter.ofPattern("dd MMM yyyy", new Locale("pt-br", "BR", "dd MMM yyyy")));
+    }
+
+    public static String LocalDateToBrFormat(LocalDate date){
+        return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 }

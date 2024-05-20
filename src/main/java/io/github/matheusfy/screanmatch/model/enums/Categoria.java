@@ -23,7 +23,7 @@ public enum Categoria {
                 return categoria;
             }
         }
-        throw new IllegalArgumentException("Nenhuma categoria encontrada para a string fornecida: " + text);
+        throw new IllegalArgumentException("Categoria não mapeada para a string fornecida: " + text);
     }
 
     public static Categoria fromPortugues(String text) {

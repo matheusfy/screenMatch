@@ -3,9 +3,10 @@ package io.github.matheusfy.screanmatch.model.api;
 import io.github.matheusfy.screanmatch.http.HttpHandler;
 import io.github.matheusfy.screanmatch.model.entity.Episodio;
 import io.github.matheusfy.screanmatch.model.dtos.EpisodioDTO;
-import io.github.matheusfy.screanmatch.model.dtos.DadosFilmeDTO;
+import io.github.matheusfy.screanmatch.model.dtos.FilmeDTO;
 import io.github.matheusfy.screanmatch.model.dtos.SerieDTO;
 import io.github.matheusfy.screanmatch.model.dtos.TemporadaDTO;
+import io.github.matheusfy.screanmatch.model.entity.Filme;
 import io.github.matheusfy.screanmatch.service.Conversor;
 
 import java.util.*;
@@ -23,18 +24,21 @@ public class ConsumoApi {
         return httpHandler.buildAndSendRequest(apiUri);
     }
 
-    public void obterDadosFilme(String apiUri){
+    public FilmeDTO obterDadosFilme(String apiUri){
 
         String json = obterDado(apiUri);
 
         if(conversor.isValidResponse(json)){
-            DadosFilmeDTO filme = buscaDados(json, DadosFilmeDTO.class);
-            System.out.println(filme.toString());
+            if(conversor.getType(json).equals("movie")){
+                return buscaDados(json, FilmeDTO.class);
+            } else {
+                //TODO: Alterar para erro no tipo de programa obitido
+                throw new RuntimeException("Não é um filme");
+            }
         } else {
             // TODO: Utilizar logger e exception para informar usuario que não foi encontrado a serie buscada
-            System.out.println("Filme não encontrado");
+            throw new RuntimeException("Filme não encontrado");
         }
-
     }
 
 
@@ -63,42 +67,9 @@ public class ConsumoApi {
 
         if(serie.isPresent()){
             List<TemporadaDTO> lstTemporadas = getTemporadas(apiUri, serie.get().totalTemporadas());
-            List<Episodio> episodios = getEpisodios(lstTemporadas);
-//            episodios.forEach(System.out::println);
-            return episodios;
+            return getEpisodios(lstTemporadas);
         }
-
         return null;
-
-
-//            String texto = """
-//                            Digite 1 para buscar por um episódio.
-//                            Digite 2 para calcular a média de avaliação das temporadas.
-//                            Digite 3 para mostrar os 5 melhores episódios da série.
-//                            """;
-//
-//            System.out.println(texto);
-
-//            int opcao = scanner.nextInt();
-
-//            switch (opcao){
-//                case 1 ->{
-//                    scanner.nextLine(); // flush do buffer
-//                    System.out.println("Digite o nome do episódio: ");
-//                    String  episodioName = scanner.nextLine();
-//
-//                    Optional<Episodio> episodio = buscaEpisodio(episodioName, episodios);
-//
-//                    if (episodio.isPresent()){
-//                        System.out.println(episodio.get().toString());
-//                    } else {
-//                        System.out.println("Episódio não encontrado");
-//                    }
-//                }
-//                case 2 -> mostrarMediaTemporadas(episodios);
-//                case 3 -> getMelhores5Episodios(lstTemporadas).forEach(System.out::println);
-//            }
-
     }
 
     public List<TemporadaDTO> getTemporadas(String uri, Integer temporadas){
